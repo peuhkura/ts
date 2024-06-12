@@ -17,13 +17,21 @@ const parseArguments = (args: string[]): MultiplyValues => {
   }
 }
 
-const multiplicator = (a: number, b: number, printText: string) => {
-  console.log(printText,  a * b);
+// Optimal weight: 18.5 to 24.9 (Ref: https://en.wikipedia.org/wiki/Body_mass_index)
+const calculateBmi = (valueCm: number, valueKg: number) => {
+  let bmi = valueKg * 100 * 100 / valueCm / valueCm;
+  if (bmi >= 18.5 && bmi <= 24.9) {
+     console.log('Normal (healthy weight)'); 
+  } else {
+     console.log('Not normal'); 
+  }
 }
 
 try {
-  const { value1, value2 } = parseArguments(process.argv);
-  multiplicator(value1, value2, `Multiplied ${value1} and ${value2}, the result is:`);
+  // const { value1, value2 } = parseArguments(process.argv);
+  let valueCm = 187;
+  let valueKg = 80;
+  calculateBmi(valueCm, valueKg);
 } catch (error: unknown) {
   let errorMessage = 'Something bad happened.'
   if (error instanceof Error) {
