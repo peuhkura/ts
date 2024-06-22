@@ -37,6 +37,7 @@ function calculateExercises (hours: Array<number>, target: number): Exercise {
   result.rating = 1;
   result.ratingDescription = 'cheer up';
   if (result.target == result.trainingDays) {
+    result.success = true;
     result.rating = 3;
     result.ratingDescription = 'solid work';
   }
@@ -49,9 +50,29 @@ function calculateExercises (hours: Array<number>, target: number): Exercise {
 }
 
 try {
-  let hoursPerDay: Array<number>;
+  const args = process.argv.slice(2);
+  if (args.length < 2) {
+    console.error('Please provide at least two arguments.');
+    process.exit(1);
+  }
 
-  console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2))
+  let target: number;
+  let hoursPerDay: Array<number> = [];
+  
+  target = parseFloat(args[0]);
+  if (isNaN(target)) {
+    throw new Error(`Argument "${args[0]}" is not a valid number.`);
+  }
+
+  for (let i = 1; i < args.length; i++) {
+    const tmp = parseFloat(args[i]);
+    if (isNaN(tmp)) {
+      throw new Error(`Argument "${args[i]}" is not a valid number.`);
+    }
+    hoursPerDay.push(tmp);
+  }
+
+  console.log(calculateExercises(hoursPerDay, target))
 } catch (error: unknown) {
   let errorMessage = 'Something bad happened.'
   if (error instanceof Error) {
