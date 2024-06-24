@@ -1,8 +1,7 @@
  
 export function calculateBmi (cm: number, kg: number): string {
     let result: string = '';
-    let bmi: number;
-    bmi = 100 * 100 * kg / cm / cm; 
+    const bmi: number = 100 * 100 * kg / cm / cm; 
     if (bmi < 18.5) {
         result = `Underweight`;
     } else if (bmi >= 18.5 && bmi < 24.9) {
