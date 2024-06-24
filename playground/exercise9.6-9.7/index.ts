@@ -12,8 +12,8 @@ function isString(value: unknown): value is string {
   return typeof value === 'string';
 }
 
-function areAllNumbers(arr: Array<any>) {
-  for (let element of arr) {
+function areAllNumbers(arr: Array<number>) {
+  for (const element of arr) {
       if (typeof element !== 'number' || isNaN(element)) {
           return false;
       }
@@ -21,9 +21,14 @@ function areAllNumbers(arr: Array<any>) {
   return true;
 }
 
+interface ExerciseRequestBody {
+  daily_exercises: Array<number>;
+  target: number;
+}
+
 app.post('/exercises', (req, res) => {
   try {
-    const body = req.body;
+    const body = req.body as ExerciseRequestBody;
     console.log('DEBUG body:', body);
 
     // Check parameters
@@ -39,7 +44,7 @@ app.post('/exercises', (req, res) => {
       throw String("malformatted parameters");
     }
 
-    let tmp: Exercise = calculateExercises(body.daily_exercises, body.target);
+    const tmp: Exercise = calculateExercises(body.daily_exercises, body.target);
     res.send(tmp);
   } catch (error) {
     let tmp: string = 'unknown exception';

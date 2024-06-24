@@ -9,7 +9,7 @@ export interface Exercise {
 }
 
 export function calculateExercises (hours: Array<number>, target: number): Exercise {
-  let result: Exercise = {
+  const result: Exercise = {
     periodLength: 0,
     trainingDays: 0,
     success: false,
@@ -17,7 +17,7 @@ export function calculateExercises (hours: Array<number>, target: number): Exerc
     ratingDescription: 'tbd',
     target: target,
     average: 0
-  }
+  };
 
   result.periodLength = hours.length;
   for (let i = 0; i < hours.length; i++) {
