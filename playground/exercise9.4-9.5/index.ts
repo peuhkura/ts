@@ -1,5 +1,6 @@
 import express from 'express';
 import { calculateBmi } from './bmicalculator';
+import { calculateExercises, Excercise } from './exercisecalculator';
 
 const app = express();
 const port = 3003;
