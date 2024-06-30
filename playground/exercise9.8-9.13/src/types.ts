@@ -38,10 +38,6 @@ export enum Gender {
   Other = 'other',
 }
 
-export function isValidSex(value: string): boolean {
-  return typeof value === 'string';
-}
-
 export interface NewPatientEntry {
   id: string;
   name: string;

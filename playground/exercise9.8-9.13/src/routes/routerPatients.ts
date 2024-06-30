@@ -1,13 +1,15 @@
 import express from 'express';
 import data from '../../data/patients';
-import { PatientEntry, NewPatientEntry, Gender, isValidDate, isString, isValidSSN, isValidSex } from '../types';
+import { PatientEntry, NewPatientEntry, Gender, isValidDate, isString } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 
 const routerPatients = express.Router();
 
+/*
 function getPatientsWithoutSSN(patients: PatientEntry[]): Omit<PatientEntry, 'ssn'>[] {
   return patients.map(({ ssn, ...rest }) => rest);
 }
+*/
 
 const patientEntries: PatientEntry[] = data;
 
@@ -37,6 +39,11 @@ function mapPatientEntryToNew(patientEntries: PatientEntry[]): NewPatientEntry[]
 
 const newPatientEntries: NewPatientEntry[] = mapPatientEntryToNew(patientEntries);
 
+
+//function getNewPatientsWithoutSSN(patients: NewPatientEntry[]): Omit<NewPatientEntry, 'ssn'>[] {
+//  return patients.map(({ ssn, ...rest }) => rest);
+//}
+
 const toNewPatientEntry = (object: PatientEntry): NewPatientEntry => {
   if ( !object || typeof object !== 'object' ) {
     throw new Error('Incorrect or missing data');
@@ -64,9 +71,32 @@ const toNewPatientEntry = (object: PatientEntry): NewPatientEntry => {
   throw new Error('Incorrect data: some fields are missing');
 };
 
+//
+// GET
+//
+
+function transformNewPatientsResult(newPatients: NewPatientEntry[]): Omit<PatientEntry, 'ssn'>[] {
+  let tmp = newPatients.map(({ ssn, ...rest }) => ({
+    ...rest,
+  }));
+
+  return tmp.map(({ gender, ...rest }) => ({
+    ...rest,
+    gender: gender.toString(), // Convert Gender enum to string
+  }));
+}
+
 routerPatients.get('/', (_req, res) => {
-  res.json(getPatientsWithoutSSN (patientEntries));
+  //res.json(getPatientsWithoutSSN (patientEntries));
+  //res.json(getNewPatientsWithoutSSN (newPatientEntries));
+  res.json(transformNewPatientsResult (newPatientEntries));
+
+  //getNewPatientsWithoutSSN
 });
+
+//
+// POST
+//
 
 const setNewPatient = 
   (name: string,
@@ -88,8 +118,10 @@ const setNewPatient =
   };
 
   patientEntries.push(newPatientEntry);
-  newPatientEntries.push(toNewPatientEntry(newPatientEntry));
-  return newPatientEntry;
+
+  const result: NewPatientEntry = toNewPatientEntry(newPatientEntry);
+  newPatientEntries.push(result);
+  return result;
 };
 
 
@@ -98,7 +130,7 @@ routerPatients.post('/', (req, res) => {
     console.log('DEBUG body:', req.body);
     const { name, dateOfBirth, ssn, gender, occupation } = req.body;
 
-    if (isString(name) && isValidDate(dateOfBirth) && isValidSSN(ssn) && isValidSex(gender) && isString(occupation)) {
+    if (isString(name) && isValidDate(dateOfBirth) && isString(occupation)) {
       const addedEntry = setNewPatient(name, dateOfBirth, ssn, gender, occupation);
       res.json(addedEntry);
     }
