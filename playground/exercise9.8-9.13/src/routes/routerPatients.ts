@@ -1,20 +1,11 @@
 import express from 'express';
 import data from '../../data/patients';
-import { PatientEntry, NewPatientEntry, Gender, isValidDate, isString } from '../types';
+import { PatientEntry, NewPatientEntry, Gender } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 
 const routerPatients = express.Router();
 
-/*
-function getPatientsWithoutSSN(patients: PatientEntry[]): Omit<PatientEntry, 'ssn'>[] {
-  return patients.map(({ ssn, ...rest }) => rest);
-}
-*/
-
-const patientEntries: PatientEntry[] = data;
-
 const isGender = (param: unknown): param is Gender => {
-
   if (typeof param === 'string') {
     const stringValue: string = param;
     return Object.values(Gender).map(v => v.toString()).includes(stringValue);
@@ -25,7 +16,7 @@ const isGender = (param: unknown): param is Gender => {
 
 const parseGender = (value: unknown): Gender => {
   if (!value || !isGender(value)) {
-      throw new Error('Incorrect or missing gender: ' + value);
+      throw new String('Incorrect or missing gender: ' + value);
   }
   return value;
 };
@@ -37,39 +28,7 @@ function mapPatientEntryToNew(patientEntries: PatientEntry[]): NewPatientEntry[]
   }));
 }
 
-const newPatientEntries: NewPatientEntry[] = mapPatientEntryToNew(patientEntries);
-
-
-//function getNewPatientsWithoutSSN(patients: NewPatientEntry[]): Omit<NewPatientEntry, 'ssn'>[] {
-//  return patients.map(({ ssn, ...rest }) => rest);
-//}
-
-const toNewPatientEntry = (object: PatientEntry): NewPatientEntry => {
-  if ( !object || typeof object !== 'object' ) {
-    throw new Error('Incorrect or missing data');
-  }
-
-  if ('id' in object 
-    && 'name' in object 
-    && 'dateOfBirth' in object
-    && 'ssn' in object
-    && 'gender' in object
-    && 'occupation' in object) {
-
-    const newEntry: NewPatientEntry = {
-      id: (object.id),
-      name: (object.name),
-      dateOfBirth: (object.dateOfBirth),
-      ssn: (object.ssn),
-      gender: parseGender(object.gender),
-      occupation: (object.occupation)
-    };
-
-    return newEntry;
-  }
-
-  throw new Error('Incorrect data: some fields are missing');
-};
+const newPatientEntries: NewPatientEntry[] = mapPatientEntryToNew(data);
 
 //
 // GET
@@ -87,16 +46,54 @@ function transformNewPatientsResult(newPatients: NewPatientEntry[]): Omit<Patien
 }
 
 routerPatients.get('/', (_req, res) => {
-  //res.json(getPatientsWithoutSSN (patientEntries));
-  //res.json(getNewPatientsWithoutSSN (newPatientEntries));
   res.json(transformNewPatientsResult (newPatientEntries));
-
-  //getNewPatientsWithoutSSN
 });
 
 //
 // POST
 //
+
+const isNameValid = (param: unknown): string => {
+  if (param && typeof param === 'string') {
+    const stringValue: string = param;
+    return stringValue;
+  } 
+  console.log('Name is not a string');
+  throw Error("Name fail.");
+  return '';
+};
+
+function isDateValid(date: string): string {
+  if (!(date && typeof date === 'string' && Date.parse(date))) {
+    console.log('Date is not valid.');
+    throw Error("Date fail.");
+  } 
+  return date;
+}
+
+function isSSNValid(ssn: string): string {
+  // Regular expression to match Finnish SSN format
+  const ssnRegex = /^(\d{2})(\d{2})(\d{2})[A+\-](\d{3})(\w{1})$/;
+
+  // Check if the SSN matches the format
+
+  const match = ssn.match(ssnRegex);
+  if (!match) {
+    console.log('SSN is not valid.');
+    throw Error("SSN fail.");
+  }
+  return ssn;
+}
+
+const isOccupationValid = (param: unknown): string => {
+  if (param && typeof param === 'string') {
+    const stringValue: string = param;
+    return stringValue;
+  } 
+  console.log('Occupation is not a string');
+  throw Error("Occupation fail.");
+  return '';
+};
 
 const setNewPatient = 
   (name: string,
@@ -108,44 +105,35 @@ const setNewPatient =
 
   const newUuid = uuidv4()
 
-  const newPatientEntry = {
+  const newEntry: NewPatientEntry = {
     id: newUuid,
-    name,
-    dateOfBirth,
-    ssn,
-    gender,
-    occupation,
+    name: isNameValid(name),
+    dateOfBirth: isDateValid(dateOfBirth),
+    ssn: isSSNValid(ssn),
+    gender: parseGender(gender),
+    occupation: isOccupationValid(occupation)
   };
 
-  patientEntries.push(newPatientEntry);
-
-  const result: NewPatientEntry = toNewPatientEntry(newPatientEntry);
-  newPatientEntries.push(result);
-  return result;
+  //const result: NewPatientEntry = newEntry;
+  newPatientEntries.push(newEntry);
+  return newEntry;
 };
-
 
 routerPatients.post('/', (req, res) => {
   try {
     console.log('DEBUG body:', req.body);
     const { name, dateOfBirth, ssn, gender, occupation } = req.body;
 
-    if (isString(name) && isValidDate(dateOfBirth) && isString(occupation)) {
-      const addedEntry = setNewPatient(name, dateOfBirth, ssn, gender, occupation);
-      res.json(addedEntry);
-    }
-
+    const addedEntry = setNewPatient(name, dateOfBirth, ssn, gender, occupation);
+    res.json(addedEntry);
   } catch (error) {
-    let tmp: string = 'unknown exception';
-    if (isString(error)) {
-      let stringValue: string = error as string;
-      tmp = stringValue;
-    }
+    console.log('Something went wrong.');
 
-    const responseData = {
-        error: tmp
-    };
-    res.send(responseData);
+    let errorMessage = 'Something went wrong.';
+    if (error instanceof Error) {
+      errorMessage += ' Error: ' + error.message;
+    }
+    res.status(400).send(errorMessage);
   }
 });
 
