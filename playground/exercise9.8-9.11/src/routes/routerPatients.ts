@@ -14,14 +14,6 @@ const patientEntries: PatientEntry[] = data;
 routerPatients.get('/', (_req, res) => {
   res.json(getPatientsWithoutSSN (patientEntries));
 });
-7
-/*
-  id: string;
-  name: string;
-  dateOfBirth: string;
-  ssn: string;
-  gender: string;
-  occupation: string;*/
 
 const setNewPatient = 
   (name: string,
