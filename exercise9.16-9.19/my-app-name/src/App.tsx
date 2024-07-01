@@ -1,35 +1,78 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+
+import React, { useEffect, useState } from 'react';
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+type Weather = 'sunny' | 'rainy' | 'cloudy' | 'windy' | 'stormy';
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+type Visibility = 'great' | 'good' | 'ok' | 'poor';
+
+interface DiaryEntry {
+  id: number;
+  date: string;
+  weather: Weather;
+  visibility: Visibility;
+  comment: string;
 }
 
-export default App
+
+// Define a type for the response data
+interface ResponseData {
+  // Adjust according to your actual response structure
+  id: number;
+  name: string;
+  // Add other fields as needed
+}
+
+const App: React.FC = () => {
+  const [data, setData] = useState<ResponseData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Replace with your API endpoint
+    const apiUrl = 'http://localhost:3000/api/diaries';
+
+    // Fetch the data from the API
+    fetch(apiUrl)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then((data: ResponseData) => {
+        setData(data);
+        console.log('API Response:', data); // Print response to console
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError(error.message);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  return (
+    <div>
+      <h1>API Response Data</h1>
+      {data ? (
+        <div>
+          <p>ID: {data.id}</p>
+          <p>Name: {data.name}</p>
+          {/* Render other fields as needed */}
+        </div>
+      ) : (
+        <p>No data available</p>
+      )}
+    </div>
+  );
+};
+
+export default App;
