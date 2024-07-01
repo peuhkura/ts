@@ -71,7 +71,7 @@ const App = () => {
   //
   // Content
   // 
-  const exerciseData = [
+  const parts = [
     {
       name: 'Fundamentals of React',
       exercises: 10
@@ -107,60 +107,29 @@ const App = () => {
   //
   // Total exercises
   // 
-  const formattedPartsString = exerciseData.join(', ');
-
   interface TotalProps {
-    parts: number;
+    total: number;
   }
-  const Total: React.FC<TotalProps> = ({ parts }) => (
-    <div>{parts}</div>
-  );
-  const formattedPartsTotal = 12; //exerciseData.reduce((total, exercise) => total + exercise.exercises, 0);
+  const Total: React.FC<TotalProps> = ({ total }) => {
+    return (
+      <p>
+        Number of exercises {total}
+      </p>
+    );
+  };
+  const totalExercises = parts.reduce((total, exercise) => total + exercise.exercises, 0);
 
-
+  //
+  // Result
+  //
   return (
     <div>
       <Header name={name} />
-      <p>
-        {exerciseData[0].name} {exerciseData[0].exercises}
-      </p>
-      <p>
-        {exerciseData[1].name} {exerciseData[1].exercises}
-      </p>
-      <p>
-        {exerciseData[2].name} {exerciseData[2].exercises}
-      </p>
-      <p>
-        Number of exercises {formattedPartsTotal}
-      </p>
-    </div>
-  );
+      <Content parts={parts} />
+      <Total total={totalExercises} />
 
-  /*return (
-    <div>
-      <Header course={courseName} />
-      <Content parts={formattedPartsString} />
-      <Total parts={formattedPartsTotal} />
     </div>
-  )*/
-
-  /*return (
-    <div>
-      <Header name={courseName} />
-      <p>
-        {courseParts[0].name} {courseParts[0].exerciseCount}
-      </p>
-      <p>
-        {courseParts[1].name} {courseParts[1].exerciseCount}
-      </p>
-      <p>
-        {courseParts[2].name} {courseParts[2].exerciseCount}
-      </p>
-      <p>
-        Number of exercises {totalExercises}
-      </p>
-    </div>
-  );*/
+  )
 };
 
 export default App;
