@@ -23,6 +23,33 @@ interface ResponseData {
   // Add other fields as needed
 }
 
+const App = () => {
+  //
+  // Header
+  // 
+  const name = 'Half Stack application development';
+
+  type HeaderProps = {
+    name: string;
+  };
+  
+  const Header: React.FC<HeaderProps> = ({ name }) => (
+    <h1>{name}</h1>
+  );
+
+
+  //
+  // Result
+  //
+  return (
+    <div>
+      <Header name={name} />
+
+    </div>
+  )
+}
+
+/*
 const App: React.FC = () => {
   const [data, setData] = useState<ResponseData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -30,7 +57,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // Replace with your API endpoint
-    const apiUrl = 'http://localhost:3000/api/diaries';
+    const apiUrl = '/api/diaries';
 
     // Fetch the data from the API
     fetch(apiUrl)
@@ -52,11 +79,11 @@ const App: React.FC = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>Loading2...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div>Error2: {error} Data {toString(data)}</div>;
   }
 
   return (
@@ -66,7 +93,6 @@ const App: React.FC = () => {
         <div>
           <p>ID: {data.id}</p>
           <p>Name: {data.name}</p>
-          {/* Render other fields as needed */}
         </div>
       ) : (
         <p>No data available</p>
@@ -74,5 +100,5 @@ const App: React.FC = () => {
     </div>
   );
 };
-
+*/
 export default App;
