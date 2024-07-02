@@ -11,94 +11,71 @@ interface DiaryEntry {
   date: string;
   weather: Weather;
   visibility: Visibility;
-  comment: string;
+  comment?: string;
 }
 
-
-// Define a type for the response data
-interface ResponseData {
-  // Adjust according to your actual response structure
-  id: number;
-  name: string;
-  // Add other fields as needed
-}
-
-const App = () => {
-  //
-  // Header
-  // 
-  const name = 'Half Stack application development';
-
-  type HeaderProps = {
-    name: string;
-  };
-  
-  const Header: React.FC<HeaderProps> = ({ name }) => (
-    <h1>{name}</h1>
-  );
-
-
-  //
-  // Result
-  //
-  return (
-    <div>
-      <Header name={name} />
-
-    </div>
-  )
-}
-
-/*
-const App: React.FC = () => {
-  const [data, setData] = useState<ResponseData | null>(null);
+const FetchDiaryEntries: React.FC = () => {
+  const [entries, setEntries] = useState<DiaryEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Replace with your API endpoint
-    const apiUrl = '/api/diaries';
+    const fetchData = () => {
+      fetch('http://localhost:3000/api/diaries')
+        .then(response => {
+          console.log('Response status:', response.status); // Log response status
+          if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+          }
+          const contentType = response.headers.get('content-type');
+          console.log('Content-Type:', contentType); // Log Content-Type
+          if (!contentType || !contentType.includes('application/json')) {
+            throw new TypeError("Received content-type isn't JSON");
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Fetched data:', data); // Log the fetched data
+          setEntries(data);
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+          setError(error.message);
+          setLoading(false);
+        });
+    };
 
-    // Fetch the data from the API
-    fetch(apiUrl)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then((data: ResponseData) => {
-        setData(data);
-        console.log('API Response:', data); // Print response to console
-        setLoading(false);
-      })
-      .catch((error) => {
-        setError(error.message);
-        setLoading(false);
-      });
+    fetchData();
   }, []);
 
-  if (loading) {
-    return <div>Loading2...</div>;
-  }
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error loading data: {error}</p>;
 
-  if (error) {
-    return <div>Error2: {error} Data {toString(data)}</div>;
-  }
+  if (entries.length === 0) return <p>No entries found.</p>; // Handle empty array
 
   return (
     <div>
-      <h1>API Response Data</h1>
-      {data ? (
-        <div>
-          <p>ID: {data.id}</p>
-          <p>Name: {data.name}</p>
-        </div>
-      ) : (
-        <p>No data available</p>
-      )}
+      <h1>Diary Entries</h1>
+      <ul>
+        {entries.map(entry => (
+          <li key={entry.id}>
+            <p><b>Date: {entry.date}</b></p>
+            <p>Weather: {entry.weather}</p>
+            <p>Visibility: {entry.visibility}</p>
+            <p>Comment: {entry.comment}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
-*/
+
+const App: React.FC = () => {
+  return (
+    <div className="App">
+      <FetchDiaryEntries />
+    </div>
+  );
+}
 export default App;
