@@ -23,4 +23,3 @@ const create = async (object: Omit<DiaryEntry, 'id'>) => {
 export default {
   getAll, create
 };
-

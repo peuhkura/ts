@@ -2,12 +2,33 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import './App.css';
 import diariesService from './services/diaries';
-import { DiaryEntry } from './types';
+import { DiaryEntry, Weather, Visibility } from './types';
+import { Button } from '@mui/material';
+import AddDiaryEntryModal from './AddDiaryEntryModal';
+
+/*
+interface ValidationError {
+  message: string;
+  errors: Record<string, string[]>
+}
+*/
 
 const App: React.FC = () => {
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [submissionError, setSubmissionError] = useState<string | undefined>();
+
+  const openModal = () => {
+    setModalOpen(true);
+    console.log('Open modal');
+  };
+  
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setSubmissionError(undefined);
+  };
 
   const fetchEntries = useCallback(async () => {
     setLoading(true);
@@ -25,6 +46,32 @@ const App: React.FC = () => {
     fetchEntries();
   }, [fetchEntries]);
 
+  const validateEntry = (entry: DiaryEntry): string | null => {
+    if (!entry.date) return "Date is required";
+    if (!entry.weather || !Object.values(Weather).includes(entry.weather)) return "Valid weather is required";
+    if (!entry.visibility || !Object.values(Visibility).includes(entry.visibility)) return "Valid visibility is required";
+    if (!entry.comment) return "Comment is required";
+    return null;
+  };
+  
+  const submitDiaryEntry = async (entry: Omit<DiaryEntry, 'id'>) => {
+    const validationError = validateEntry(entry);
+    if (validationError) {
+      setSubmissionError(validationError);
+      return;
+    }
+
+    try {
+      await diariesService.create(entry);
+      fetchEntries(); // Re-fetch entries after successful submission
+      setModalOpen(false);
+    } catch (error) {
+        {
+        setSubmissionError('Unknown error');
+      }
+    }
+  };
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error loading data: {error}</p>;
 
@@ -41,6 +88,15 @@ const App: React.FC = () => {
           </li>
         ))}
       </ul>
+      <AddDiaryEntryModal
+        modalOpen={modalOpen}
+        onSubmit={submitDiaryEntry}
+        error={submissionError}
+        onClose={closeModal}
+      />
+      <Button variant="contained" onClick={openModal}>
+        Add New Diary Entry
+      </Button>
     </div>
   );
 };
