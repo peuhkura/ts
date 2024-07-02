@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import './App.css'
+import AddDiaryEntryModal from "./AddDiaryEntryModal";
 
 type Weather = 'sunny' | 'rainy' | 'cloudy' | 'windy' | 'stormy';
 
@@ -72,10 +73,48 @@ const FetchDiaryEntries: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [error, setError] = useState<string>();
+
+  const openModal = (): void => setModalOpen(true);
+
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setError(undefined);
+  };
+
+  const submitDiaryEntry = async (values: DiaryEntry) => {
+    /*try {
+      const patient = await patientService.create(values);
+      setPatients(patients.concat(patient));
+      setModalOpen(false);
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        if (e?.response?.data && typeof e?.response?.data === "string") {
+          const message = e.response.data.replace('Something went wrong. Error: ', '');
+          console.error(message);
+          setError(message);
+        } else {
+          setError("Unrecognized axios error");
+        }
+      } else {
+        console.error("Unknown error", e);
+        setError("Unknown error");
+      }
+    }*/
+  };
+
   return (
     <div className="App">
       <FetchDiaryEntries />
+      <AddDiaryEntryModal
+        modalOpen={modalOpen}
+        onSubmit={submitDiaryEntry}
+        error={error}
+        onClose={closeModal}
+      />
     </div>
   );
 }
+
 export default App;
