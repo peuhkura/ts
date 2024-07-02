@@ -55,7 +55,10 @@ const App: React.FC = () => {
     return null;
   };
   
-  const submitDiaryEntry = async (entry: Omit<DiaryEntry, 'id'>) => {
+  const submitDiaryEntry = async (entry: DiaryEntry) => {
+    const newId = entries.length > 0 ? Math.max(...entries.map(item => item.id)) + 1 : 1;
+    entry.id = newId;
+
     const validationError = validateEntry(entry);
     if (validationError) {
       setSubmissionError(validationError);
