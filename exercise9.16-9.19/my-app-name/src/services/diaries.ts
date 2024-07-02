@@ -11,7 +11,7 @@ const getAll = async () => {
   return data;
 };
 
-const create = async (object: DiaryEntry) => {
+const create = async (object: Omit<DiaryEntry, 'id'>) => {
   const { data } = await axios.post<DiaryEntry>(
     `${apiBaseUrl}/diaries`,
     object

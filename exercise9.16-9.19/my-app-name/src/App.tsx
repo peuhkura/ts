@@ -4,7 +4,13 @@ import './App.css';
 import AddDiaryEntryModal from './AddDiaryEntryModal';
 import { Button } from '@mui/material';
 import diariesService from './services/diaries';
-import { DiaryEntry } from './types';
+import { DiaryEntry, Weather, Visibility } from './types';
+import axios from "axios";
+
+interface ValidationError {
+  message: string;
+  errors: Record<string, string[]>
+}
 
 const App: React.FC = () => {
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
@@ -36,13 +42,36 @@ const App: React.FC = () => {
     setSubmissionError(undefined);
   };
 
+  const validateEntry = (entry: DiaryEntry): string | null => {
+    if (!entry.date) return "Date is required";
+    if (!entry.weather || !Object.values(Weather).includes(entry.weather)) return "Valid weather is required";
+    if (!entry.visibility || !Object.values(Visibility).includes(entry.visibility)) return "Valid visibility is required";
+    if (!entry.comment) return "Comment is required";
+    return null;
+  };
+
   const submitDiaryEntry = async (entry: Omit<DiaryEntry, 'id'>) => {
+    const validationError = validateEntry(entry);
+    if (validationError) {
+      setSubmissionError(validationError);
+      return;
+    }
+
     try {
       await diariesService.create(entry);
       fetchEntries(); // Re-fetch entries after successful submission
       setModalOpen(false);
     } catch (error) {
-      setSubmissionError('Submit error: ' + error);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.data && typeof error.response?.data === 'string') {
+          const message = error.response.data.replace('Something went wrong. Error: ', '');
+          setSubmissionError(message);
+        } else {
+          setSubmissionError('Unrecognized axios error');
+        }
+      } else {
+        setSubmissionError('Unknown error');
+      }
     }
   };
 
