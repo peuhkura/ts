@@ -5,6 +5,7 @@ import diariesService from './services/diaries';
 import { DiaryEntry, Weather, Visibility } from './types';
 import { Button } from '@mui/material';
 import AddDiaryEntryModal from './AddDiaryEntryModal';
+import axios from "axios";
 
 /*
 interface ValidationError {
@@ -66,7 +67,14 @@ const App: React.FC = () => {
       fetchEntries(); // Re-fetch entries after successful submission
       setModalOpen(false);
     } catch (error) {
-        {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.data && typeof error.response?.data === 'string') {
+          const message = error.response.data.replace('Something went wrong. Error: ', '');
+          setSubmissionError(message);
+        } else {
+          setSubmissionError('Unrecognized axios error');
+        }
+      } else {
         setSubmissionError('Unknown error');
       }
     }
