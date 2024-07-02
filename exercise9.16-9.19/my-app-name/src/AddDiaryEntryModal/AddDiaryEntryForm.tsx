@@ -7,6 +7,15 @@ interface Props {
   onSubmit: (values: DiaryEntry) => void;
 }
 
+interface WeatherOption{
+  value: Weather;
+  label: string;
+}
+
+const weatherOptions: WeatherOption[] = Object.values(Weather).map(v => ({
+  value: v, label: v.toString()
+}));
+
 interface VisibilityOption{
   value: Visibility;
   label: string;
@@ -22,6 +31,17 @@ const AddDiaryEntryForm = ({ onCancel, onSubmit }: Props) => {
   const [weather, setWeather] = useState(Weather.Cloudy);
   const [visibility, setVisibility] = useState(Visibility.Poor);
   const [comment, setComment] = useState<string>('');
+
+  const onWeatherChange = (event: SelectChangeEvent<string>) => {
+    event.preventDefault();
+    if ( typeof event.target.value === "string") {
+      const value = event.target.value;
+      const tmp = Object.values(Weather).find(g => g.toString() === value);
+      if (tmp) {
+        setWeather(tmp);
+      }
+    }
+  };
 
   const onVisibilityChange = (event: SelectChangeEvent<string>) => {
     event.preventDefault();
@@ -50,27 +70,37 @@ const AddDiaryEntryForm = ({ onCancel, onSubmit }: Props) => {
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
-      {/* Your form inputs for id, date, weather, visibility, and comment */}
-      <p>MORO</p>
-      <TextField
+      <TextField style={{ marginTop: 10 }}
         label="Id"
+        fullWidth
         type="text"
         value={id}
         onChange={(e) => setId(e.target.value)}
       />
-      <TextField
+      <TextField style={{ marginTop: 10 }}
         label="Date"
+        fullWidth
         type="text"
         value={date}
         onChange={(e) => setDate(e.target.value)}
       />
-      <TextField
-        label="Weather"
-        type="text"
-        value={weather}
-        onChange={(e) => setWeather(Weather.Cloudy)}
-      />
-      <InputLabel style={{ marginTop: 20 }}>Visibility</InputLabel>
+      <InputLabel style={{ marginTop: 10 }}>Weather</InputLabel>
+        <Select
+          label="Weather"
+          fullWidth
+          value={weather}
+          onChange={onWeatherChange}
+        >
+        {weatherOptions.map(option =>
+          <MenuItem
+            key={option.label}
+            value={option.value}
+          >
+            {option.label
+          }</MenuItem>
+        )}
+        </Select>
+      <InputLabel style={{ marginTop: 10 }}>Visibility</InputLabel>
         <Select
           label="Visibility"
           fullWidth
@@ -86,13 +116,14 @@ const AddDiaryEntryForm = ({ onCancel, onSubmit }: Props) => {
           }</MenuItem>
         )}
         </Select>
-      <TextField
+      <TextField style={{ marginTop: 10 }}
         label="Comment"
+        fullWidth
         type="text"
         value={comment}
         onChange={(e) => setComment(e.target.value)}
       />
-      <button type="submit">Submit</button>
+      <button  style={{ marginTop: 20 }} type="submit">Submit</button>
     </form>
   );
 };
