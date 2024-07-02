@@ -51,6 +51,7 @@ const AddDiaryEntryForm = ({ onCancel, onSubmit }: Props) => {
   return (
     <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
       {/* Your form inputs for id, date, weather, visibility, and comment */}
+      <p>MORO</p>
       <TextField
         label="Id"
         type="text"

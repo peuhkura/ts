@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css'
 import AddDiaryEntryModal from "./AddDiaryEntryModal";
+import { Button } from '@mui/material';
 
 type Weather = 'sunny' | 'rainy' | 'cloudy' | 'windy' | 'stormy';
 
@@ -113,6 +114,9 @@ const App: React.FC = () => {
         error={error}
         onClose={closeModal}
       />
+      <Button variant="contained" onClick={() => openModal()}>
+        Add New Diary Entry
+      </Button>
     </div>
   );
 }
