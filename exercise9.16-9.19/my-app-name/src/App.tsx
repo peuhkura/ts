@@ -4,6 +4,10 @@ import './App.css'
 import AddDiaryEntryModal from "./AddDiaryEntryModal";
 import { Button } from '@mui/material';
 
+import diariesService from "./services/diaries";
+import diaries from './services/diaries';
+import { Weather, Visibility, DiaryEntry } from './types'
+/*
 type Weather = 'sunny' | 'rainy' | 'cloudy' | 'windy' | 'stormy';
 
 type Visibility = 'great' | 'good' | 'ok' | 'poor';
@@ -14,7 +18,7 @@ interface DiaryEntry {
   weather: Weather;
   visibility: Visibility;
   comment?: string;
-}
+}*/
 
 const FetchDiaryEntries: React.FC = () => {
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
@@ -73,6 +77,9 @@ const FetchDiaryEntries: React.FC = () => {
   );
 };
 
+//
+// App
+// 
 const App: React.FC = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [error, setError] = useState<string>();
@@ -84,7 +91,38 @@ const App: React.FC = () => {
     setError(undefined);
   };
 
-  const submitDiaryEntry = async (values: DiaryEntry) => {
+  /*const submitDiaryEntry = async (values: DiaryEntry) => {
+    try {
+      console.log(values);
+
+      const patient = await diariesService.create(values);
+      //setDiaryEntry(diaries.concat(patient));
+      setModalOpen(false);
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        if (e?.response?.data && typeof e?.response?.data === "string") {
+          const message = e.response.data.replace('Something went wrong. Error: ', '');
+          console.error(message);
+          setError(message);
+        } else {
+          setError("Unrecognized axios error");
+        }
+      } else {
+        console.error("Unknown error", e);
+        setError("Unknown error");
+      }
+      console.error("Error", e);
+    }*/
+    
+  const submitDiaryEntry = async (entry: DiaryEntry) => {
+    const tmp = await diariesService.create(entry);
+    //setDiaryEntry(diaries.concat(tmp));
+    diariesService.getAll();
+    fetchData();
+    console.log(entry);
+    setModalOpen(false);
+  };
+  
     /*try {
       const patient = await patientService.create(values);
       setPatients(patients.concat(patient));
@@ -102,8 +140,8 @@ const App: React.FC = () => {
         console.error("Unknown error", e);
         setError("Unknown error");
       }
-    }*/
-  };
+    }
+  };*/
 
   return (
     <div className="App">
@@ -120,5 +158,40 @@ const App: React.FC = () => {
     </div>
   );
 }
+
+/*
+
+const App = () => {
+  const [patients, setPatients] = useState<Patient[]>([]);
+
+  useEffect(() => {
+    void axios.get<void>(`${apiBaseUrl}/ping`);
+
+    const fetchPatientList = async () => {
+      const patients = await patientService.getAll();
+      setPatients(patients);
+    };
+    void fetchPatientList();
+  }, []);
+  
+  return (
+    <div className="App">
+      <Router>
+        <Container>
+          <Typography variant="h3" style={{ marginBottom: "0.5em" }}>
+            Patientor
+          </Typography>
+          <Button component={Link} to="/" variant="contained" color="primary">
+            Home
+          </Button>
+          <Divider hidden />
+          <Routes>
+            <Route path="/" element={<PatientListPage patients={patients} setPatients={setPatients} />} />
+          </Routes>
+        </Container>
+      </Router>
+    </div>
+  );
+};*/
 
 export default App;
