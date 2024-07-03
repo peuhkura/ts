@@ -48,14 +48,42 @@ function transformNewPatientsResult(newPatients: NewPatientEntry[]): Omit<Patien
   }));
 }
 
+
+function transformNewPatientsResultWithSsn(newPatients: NewPatientEntry[]): Omit<PatientEntry, 'ssn'>[] {
+  return newPatients.map(({ gender, ...rest }) => ({
+    ...rest,
+    gender: gender.toString(), // Convert Gender enum to string
+  }));
+}
+
 routerPatients.get('/', (req, res) => {
   const patientId = req.query.patientId;
-  console.log(`Received xxx: ${req.query}`);
-  console.log(`Received xxx: ${JSON.stringify(req.query)}`);
 
-  console.log(`Received categoryId: ${patientId}`);
+  //console.log(`Received: ${req.query}`);
+  //console.log(`Received (json): ${JSON.stringify(req.query)}`);
+  console.log(`Received: ${patientId}`);
 
-  res.json(transformNewPatientsResult (newPatientEntries));
+  if (patientId !== null && typeof patientId === 'string') {
+    console.log(`Return only id: ${patientId}`);
+
+    // Function to find object by ID
+    const findById = (id: string) => {
+        return newPatientEntries.find(item => item.id === id);
+    };
+
+    // Call findById function and send response using res.json
+    const result = findById(patientId);
+    console.log(`Return only id: ${JSON.stringify(result)}`);
+    let entryArray: NewPatientEntry[] = [];
+    if (result !== undefined) {
+        entryArray.push(result);
+    }
+    res.json(transformNewPatientsResultWithSsn (entryArray));
+  } else {
+    console.log(`Return all ids.`);
+    res.json(transformNewPatientsResult (newPatientEntries));
+  }
+
 });
 
 //
