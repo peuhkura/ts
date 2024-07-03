@@ -1,5 +1,5 @@
 import express from 'express';
-import data from '../../data/patients';
+import jsonData from '../../data/patients';
 import { PatientEntry, NewPatientEntry, Gender } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -21,6 +21,7 @@ const parseGender = (value: unknown): Gender => {
   return value;
 };
 
+
 function mapPatientEntryToNew(patientEntries: PatientEntry[]): NewPatientEntry[] {
   return patientEntries.map(entry => ({
     ...entry,
@@ -28,7 +29,9 @@ function mapPatientEntryToNew(patientEntries: PatientEntry[]): NewPatientEntry[]
   }));
 }
 
-const newPatientEntries: NewPatientEntry[] = mapPatientEntryToNew(data);
+const newPatientEntries: NewPatientEntry[] = mapPatientEntryToNew(jsonData);
+//const newPatientEntries: NewPatientEntry[] = JSON.parse(jsonData) as NewPatientEntry;
+
 
 //
 // GET
@@ -48,6 +51,10 @@ function transformNewPatientsResult(newPatients: NewPatientEntry[]): Omit<Patien
 routerPatients.get('/', (_req, res) => {
   res.json(transformNewPatientsResult (newPatientEntries));
 });
+
+
+
+
 
 //
 // POST
@@ -111,7 +118,8 @@ const setNewPatient =
     dateOfBirth: isDateValid(dateOfBirth),
     ssn: isSSNValid(ssn),
     gender: parseGender(gender),
-    occupation: isOccupationValid(occupation)
+    occupation: isOccupationValid(occupation),
+    entries: []
   };
 
   //const result: NewPatientEntry = newEntry;

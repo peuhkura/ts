@@ -16,7 +16,17 @@ export interface DiagnoseEntry {
   latin?: string;
 }
 
-// Old patient entry
+export function isString(value: unknown): boolean {
+  return typeof value === 'string';
+}
+
+//
+// Backend patient entry
+//
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Entry {
+}
 
 export interface PatientEntry {
   id: string;
@@ -25,13 +35,13 @@ export interface PatientEntry {
   ssn: string;
   gender: string;
   occupation: string;
-}
-export function isString(value: unknown): boolean {
-  return typeof value === 'string';
+  entries: Entry[]
 }
 
-// New patient entry
 
+//
+// Frontend facing patient entry
+//
 export enum Gender {
   Male = 'male',
   Female = 'female',
@@ -45,7 +55,10 @@ export interface NewPatientEntry {
   ssn: string;
   gender: Gender;
   occupation: string;
+  entries: Entry[]
 }
+
+export type NonSensitivePatient = Omit<NewPatientEntry, 'ssn' | 'entries'>;
 
 export function isValidSSN(value: string): boolean {
   return typeof value === 'string';
