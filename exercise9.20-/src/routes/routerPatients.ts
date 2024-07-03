@@ -48,13 +48,15 @@ function transformNewPatientsResult(newPatients: NewPatientEntry[]): Omit<Patien
   }));
 }
 
-routerPatients.get('/', (_req, res) => {
+routerPatients.get('/', (req, res) => {
+  const patientId = req.query.patientId;
+  console.log(`Received xxx: ${req.query}`);
+  console.log(`Received xxx: ${JSON.stringify(req.query)}`);
+
+  console.log(`Received categoryId: ${patientId}`);
+
   res.json(transformNewPatientsResult (newPatientEntries));
 });
-
-
-
-
 
 //
 // POST
