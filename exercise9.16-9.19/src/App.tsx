@@ -7,13 +7,6 @@ import { Button } from '@mui/material';
 import AddDiaryEntryModal from './AddDiaryEntryModal';
 import axios from "axios";
 
-/*
-interface ValidationError {
-  message: string;
-  errors: Record<string, string[]>
-}
-*/
-
 const App: React.FC = () => {
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
