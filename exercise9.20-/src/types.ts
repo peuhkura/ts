@@ -21,7 +21,7 @@ export function isString(value: unknown): boolean {
 }
 
 //
-// Backend patient entry
+// Backend patient entry (string only)
 //
 export interface Diagnosis {
   code: string
@@ -62,9 +62,6 @@ export type Entry =
   | OccupationalHealthcareEntry
   | HealthCheckEntry;
 
-// // eslint-disable-next-line @typescript-eslint/no-empty-interface
-
-
 export interface PatientEntry {
   id: string;
   name: string;
@@ -75,7 +72,6 @@ export interface PatientEntry {
   entries: Entry[]
 }
 
-
 //
 // Frontend facing patient entry
 //
@@ -84,6 +80,22 @@ export enum Gender {
   Female = 'female',
   Other = 'other',
 }
+
+export const isGender = (param: unknown): param is Gender => {
+  if (typeof param === 'string') {
+    const stringValue: string = param;
+    return Object.values(Gender).map(v => v.toString()).includes(stringValue);
+  } 
+  console.log('Unknown value is not a string');
+  return false;
+};
+
+export const parseGender = (value: unknown): Gender => {
+  if (!value || !isGender(value)) {
+      throw new String('Incorrect or missing gender: ' + value);
+  }
+  return value;
+};
 
 export interface NewPatientEntry {
   id: string;

@@ -1,26 +1,9 @@
 import express from 'express';
 import jsonData from '../../data/patients';
-import { PatientEntry, NewPatientEntry, Gender } from '../types';
+import { PatientEntry, NewPatientEntry, Gender, parseGender } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 
 const routerPatients = express.Router();
-
-const isGender = (param: unknown): param is Gender => {
-  if (typeof param === 'string') {
-    const stringValue: string = param;
-    return Object.values(Gender).map(v => v.toString()).includes(stringValue);
-  } 
-  console.log('Unknown value is not a string');
-  return false;
-};
-
-const parseGender = (value: unknown): Gender => {
-  if (!value || !isGender(value)) {
-      throw new String('Incorrect or missing gender: ' + value);
-  }
-  return value;
-};
-
 
 function mapPatientEntryToNew(patientEntries: PatientEntry[]): NewPatientEntry[] {
   return patientEntries.map(entry => ({
@@ -30,8 +13,6 @@ function mapPatientEntryToNew(patientEntries: PatientEntry[]): NewPatientEntry[]
 }
 
 const newPatientEntries: NewPatientEntry[] = mapPatientEntryToNew(jsonData);
-//const newPatientEntries: NewPatientEntry[] = JSON.parse(jsonData) as NewPatientEntry;
-
 
 //
 // GET
@@ -48,7 +29,6 @@ function transformNewPatientsResult(newPatients: NewPatientEntry[]): Omit<Patien
   }));
 }
 
-
 function transformNewPatientsResultWithSsn(newPatients: NewPatientEntry[]): Omit<PatientEntry, 'ssn'>[] {
   return newPatients.map(({ gender, ...rest }) => ({
     ...rest,
@@ -58,11 +38,7 @@ function transformNewPatientsResultWithSsn(newPatients: NewPatientEntry[]): Omit
 
 routerPatients.get('/', (req, res) => {
   const patientId = req.query.patientId;
-
-  //console.log(`Received: ${req.query}`);
-  //console.log(`Received (json): ${JSON.stringify(req.query)}`);
   console.log(`Received: ${patientId}`);
-
   if (patientId !== null && typeof patientId === 'string') {
     console.log(`Return only id: ${patientId}`);
 
@@ -83,7 +59,6 @@ routerPatients.get('/', (req, res) => {
     console.log(`Return all ids.`);
     res.json(transformNewPatientsResult (newPatientEntries));
   }
-
 });
 
 //
@@ -113,7 +88,6 @@ function isSSNValid(ssn: string): string {
   const ssnRegex = /^(\d{2})(\d{2})(\d{2})[A+-](\d{3})(\w{1})$/;
 
   // Check if the SSN matches the format
-
   const match = ssn.match(ssnRegex);
   if (!match) {
     console.log('SSN is not valid.');
@@ -152,7 +126,6 @@ const setNewPatient =
     entries: []
   };
 
-  //const result: NewPatientEntry = newEntry;
   newPatientEntries.push(newEntry);
   return newEntry;
 };
@@ -175,10 +148,6 @@ routerPatients.post('/', (req, res) => {
     } else {
       res.status(400).send('Invalid data');
     }
-    //const { name, dateOfBirth, ssn, gender, occupation } = req.body;
-
-    //const addedEntry = setNewPatient(name, dateOfBirth, ssn, gender, occupation);
-    //res.json(addedEntry);
   } catch (error) {
     console.log('Something went wrong.');
 
