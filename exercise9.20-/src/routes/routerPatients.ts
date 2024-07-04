@@ -38,7 +38,7 @@ const newPatientEntries: NewPatientEntry[] = mapPatientEntryToNew(jsonData);
 //
 
 function transformNewPatientsResult(newPatients: NewPatientEntry[]): Omit<PatientEntry, 'ssn'>[] {
-  let tmp = newPatients.map(({ ssn, ...rest }) => ({
+  const tmp = newPatients.map(({ ssn: _ssn, ...rest }) => ({
     ...rest,
   }));
 
@@ -74,7 +74,7 @@ routerPatients.get('/', (req, res) => {
     // Call findById function and send response using res.json
     const result = findById(patientId);
     console.log(`Return only id: ${JSON.stringify(result)}`);
-    let entryArray: NewPatientEntry[] = [];
+    const entryArray: NewPatientEntry[] = [];
     if (result !== undefined) {
         entryArray.push(result);
     }
@@ -110,7 +110,7 @@ function isDateValid(date: string): string {
 
 function isSSNValid(ssn: string): string {
   // Regular expression to match Finnish SSN format
-  const ssnRegex = /^(\d{2})(\d{2})(\d{2})[A+\-](\d{3})(\w{1})$/;
+  const ssnRegex = /^(\d{2})(\d{2})(\d{2})[A+-](\d{3})(\w{1})$/;
 
   // Check if the SSN matches the format
 
@@ -140,7 +140,7 @@ const setNewPatient =
     occupation: string): 
   PatientEntry => {
 
-  const newUuid = uuidv4()
+  const newUuid = uuidv4();
 
   const newEntry: NewPatientEntry = {
     id: newUuid,
@@ -160,10 +160,25 @@ const setNewPatient =
 routerPatients.post('/', (req, res) => {
   try {
     console.log('DEBUG body:', req.body);
-    const { name, dateOfBirth, ssn, gender, occupation } = req.body;
+    const { name, dateOfBirth, ssn, gender, occupation } = req.body as PatientEntry;
 
-    const addedEntry = setNewPatient(name, dateOfBirth, ssn, gender, occupation);
-    res.json(addedEntry);
+    // Ensure type safety for each field
+    if (
+      typeof name === 'string' &&
+      typeof dateOfBirth === 'string' &&
+      typeof ssn === 'string' &&
+      Object.values(Gender).includes(gender as Gender) && // Type assertion here
+      typeof occupation === 'string'
+    ) {
+      const addedEntry = setNewPatient(name, dateOfBirth, ssn, gender, occupation);
+      res.json(addedEntry);
+    } else {
+      res.status(400).send('Invalid data');
+    }
+    //const { name, dateOfBirth, ssn, gender, occupation } = req.body;
+
+    //const addedEntry = setNewPatient(name, dateOfBirth, ssn, gender, occupation);
+    //res.json(addedEntry);
   } catch (error) {
     console.log('Something went wrong.');
 

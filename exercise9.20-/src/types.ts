@@ -23,10 +23,47 @@ export function isString(value: unknown): boolean {
 //
 // Backend patient entry
 //
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface Entry {
+export interface Diagnosis {
+  code: string
 }
+export interface BaseEntry {
+  id: string;
+  type: string;
+  description: string;
+  date: string;
+  specialist: string;
+  sickLeave?: string[];
+}
+export enum HealthCheckRating {
+  "Healthy" = 0,
+  "LowRisk" = 1,
+  "HighRisk" = 2,
+  "CriticalRisk" = 3
+}
+interface HealthCheckEntry extends BaseEntry {
+  type: "HealthCheck";
+  healthCheckRating: HealthCheckRating;
+}
+export interface OccupationalHealthcareEntry extends BaseEntry {
+  employerName: string
+}
+
+export interface Discharge {
+  date: string;
+  criteria: string;
+}
+export interface HospitalEntry extends BaseEntry {
+  diagnosisCodes: string[];
+  discharge?: Discharge;
+}
+
+export type Entry =
+  | HospitalEntry
+  | OccupationalHealthcareEntry
+  | HealthCheckEntry;
+
+// // eslint-disable-next-line @typescript-eslint/no-empty-interface
+
 
 export interface PatientEntry {
   id: string;
