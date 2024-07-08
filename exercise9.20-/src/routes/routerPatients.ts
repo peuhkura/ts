@@ -1,11 +1,12 @@
 import express from 'express';
 import jsonData from '../../data/patients';
-import { PatientEntry, NewPatientEntry, Gender, parseGender } from '../types';
+import { PatientEntry, NewPatientEntry, Gender, parseGender, BaseEntry } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 
 const routerPatients = express.Router();
 
 function mapPatientEntryToNew(patientEntries: PatientEntry[]): NewPatientEntry[] {
+  console.log(`DEBUG: patient entries mapping.`);
   return patientEntries.map(entry => ({
     ...entry,
     gender: parseGender(entry.gender), // Convert string to Gender enum
@@ -38,9 +39,9 @@ function transformNewPatientsResultWithSsn(newPatients: NewPatientEntry[]): Omit
 
 routerPatients.get('/', (req, res) => {
   const patientId = req.query.patientId;
-  console.log(`Received: ${patientId}`);
+  console.log(`DEBUG GET:`);
   if (patientId !== null && typeof patientId === 'string') {
-    console.log(`Return only id: ${patientId}`);
+    //console.log(`Return only id: ${patientId}`);
 
     // Function to find object by ID
     const findById = (id: string) => {
@@ -49,7 +50,7 @@ routerPatients.get('/', (req, res) => {
 
     // Call findById function and send response using res.json
     const result = findById(patientId);
-    console.log(`Return only id: ${JSON.stringify(result)}`);
+    console.log(`Return single patient id: ${JSON.stringify(result)}`);
     const entryArray: NewPatientEntry[] = [];
     if (result !== undefined) {
         entryArray.push(result);
@@ -130,17 +131,79 @@ const setNewPatient =
   return newEntry;
 };
 
+/*
+function addEntry() => {
+  const patientId = req.query.patientId;
+  console.log(`Received: ${patientId}`);
+  if (patientId !== null && typeof patientId === 'string') {
+    console.log(`Return only id: ${patientId}`);
+
+    // Function to find object by ID
+    const findById = (id: string) => {
+        return newPatientEntries.find(item => item.id === id);
+    };
+
+    // Call findById function and send response using res.json
+    const result = findById(patientId);
+    console.log(`Return only id: ${JSON.stringify(result)}`);
+    const entryArray: NewPatientEntry[] = [];
+    if (result !== undefined) {
+        entryArray.push(result);
+    }
+    res.json(transformNewPatientsResultWithSsn (entryArray));
+  } else {
+    console.log(`Return all ids.`);
+    res.json(transformNewPatientsResult (newPatientEntries));
+  }
+});
+*/
+
 // Define a route for getting entries for a specific patient by ID
 routerPatients.post('/:id/entries', (req, res) => {
   const patientId = req.params.id;
-  console.log('DEBUG body:', req.body);
+  console.log('DEBUG POST /:id/entries, body:', req.body);
   
-  res.json({ message: `Entries for patient ${patientId}` });
+  // Ensure type safety for each field
+  const { description, date, specialist, type } = req.body as BaseEntry;
+  if (
+    typeof description === 'string' &&
+    typeof date === 'string' &&
+    typeof specialist === 'string' &&
+    typeof type === 'string'
+  ) {
+    // Function to find object by ID
+    const findById = (id: string) => {
+      return newPatientEntries.find(item => item.id === id);
+    };
+    const result = findById(patientId);
+    if (result !== undefined) {
+      console.log('DEBUG found patient with given id:', patientId);
+
+      const newUuid = uuidv4();
+
+      //let tmp: Entry =  { description: description, date: date, specialist: specialist, type: type }
+      result.entries.push({ id: newUuid, description: description, date: date, specialist: specialist, type: type, employerName: "TODO"});
+      console.log('DEBUG result:', result);
+      const entryArray: NewPatientEntry[] = [];
+      entryArray.push(result);
+      res.json(transformNewPatientsResultWithSsn (entryArray));
+    } else {
+      console.log('DEBUG no patient with given ide:', patientId);
+
+      res.status(400).send('Patient not found with given id.');
+    }
+    //const addedEntry = setNewEntry(description, date, specialist, diagnosisCodes, type);
+    //res.json(addedEntry);
+  } else {
+    res.status(400).send('Invalid data');
+  }
+
+  //res.json({ message: `Entry for patient: ${patientId}` });
 });
 
 routerPatients.post('/', (req, res) => {
   try {
-    console.log('DEBUG body:', req.body);
+    console.log('DEBUG POST, body:', req.body);
     const { name, dateOfBirth, ssn, gender, occupation } = req.body as PatientEntry;
 
     // Ensure type safety for each field
