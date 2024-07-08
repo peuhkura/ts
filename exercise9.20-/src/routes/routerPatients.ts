@@ -130,6 +130,14 @@ const setNewPatient =
   return newEntry;
 };
 
+// Define a route for getting entries for a specific patient by ID
+routerPatients.post('/:id/entries', (req, res) => {
+  const patientId = req.params.id;
+  console.log('DEBUG body:', req.body);
+  
+  res.json({ message: `Entries for patient ${patientId}` });
+});
+
 routerPatients.post('/', (req, res) => {
   try {
     console.log('DEBUG body:', req.body);
