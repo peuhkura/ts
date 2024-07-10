@@ -158,11 +158,14 @@ function addEntry() => {
 });
 */
 
+
+
 // Define a route for getting entries for a specific patient by ID
 routerPatients.post('/:id/entries', (req, res) => {
   const patientId = req.params.id;
   console.log('DEBUG POST /:id/entries, body:', req.body);
-  
+ 
+
   // Ensure type safety for each field
   const { description, date, specialist, type } = req.body as BaseEntry;
   if (
