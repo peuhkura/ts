@@ -1,6 +1,6 @@
 import express from 'express';
 import jsonData from '../../data/patients';
-import { PatientEntry, NewPatientEntry, Gender, parseGender, BaseEntry } from '../types';
+import { HealthCheckEntry, HospitalEntry, OccupationalHealthcareEntry, Entry, PatientEntry, NewPatientEntry, Gender, parseGender, BaseEntry } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 
 const routerPatients = express.Router();
@@ -158,11 +158,73 @@ function addEntry() => {
 });
 */
 
+const isValidHealthCheckEntry = (entry: any): entry is HealthCheckEntry => {
+  return entry.healthCheckRating !== undefined;
+};
 
+const isValidOccupationalHealthcareEntry = (entry: any): entry is OccupationalHealthcareEntry => {
+  return entry.employerName !== undefined;
+};
+
+const isValidHospitalEntry = (entry: any): entry is HospitalEntry => {
+  return entry.discharge !== undefined;
+};
 
 // Define a route for getting entries for a specific patient by ID
 routerPatients.post('/:id/entries', (req, res) => {
+
+
+  const entry = req.body as Entry;
   const patientId = req.params.id;
+  const findById = (id: string) => {
+    return newPatientEntries.find(item => item.id === id);
+  };
+
+  switch (entry.type) {
+    case "HealthCheck":
+      if (isValidHealthCheckEntry(entry)) {
+        // Process HealthCheckEntry
+        console.log('Received HealthCheckEntry:', entry);
+        const { description, date, specialist, type, healthCheckRating } = req.body as HealthCheckEntry;
+
+        const newUuid = uuidv4();
+        // Function to find object by ID
+
+        const result = findById(patientId);
+        if (result !== undefined) {
+
+          //let tmp: Entry =  { description: description, date: date, specialist: specialist, type: type }
+          result.entries.push({ id: newUuid, description: description, date: date, specialist: specialist, type: type, healthCheckRating: healthCheckRating });
+          console.log('DEBUG result:', result);
+          const entryArray: NewPatientEntry[] = [];
+          entryArray.push(result);
+          res.json(transformNewPatientsResultWithSsn (entryArray));
+        }
+      } else {
+        res.status(400).send({ error: 'Invalid HealthCheckEntry' });
+      }
+      break;
+    case "OccupationalHealthcare":
+      if (isValidOccupationalHealthcareEntry(entry)) {
+        // Process OccupationalHealthcareEntry
+        console.log('Received OccupationalHealthcareEntry:', entry);
+      } else {
+        res.status(400).send({ error: 'Invalid OccupationalHealthcareEntry' });
+      }
+      break;
+    case "Hospital":
+      if (isValidHospitalEntry(entry)) {
+        // Process HospitalEntry
+        console.log('Received HospitalEntry:', entry);
+      } else {
+        res.status(400).send({ error: 'Invalid HospitalEntry' });
+      }
+      break;
+    default:
+      res.status(400).send({ error: 'Invalid entry type' });
+  }
+
+
   console.log('DEBUG POST /:id/entries, body:', req.body);
  
 
