@@ -57,6 +57,10 @@ export interface HospitalEntry extends BaseEntry {
   diagnosisCodes: string[];
   discharge?: Discharge;
 }
+export interface HospitalEntryRaw extends BaseEntry {
+  diagnosisCodes: string;
+  discharge?: Discharge;
+}
 
 export type Entry =
   | HospitalEntry
