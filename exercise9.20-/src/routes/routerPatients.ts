@@ -232,14 +232,14 @@ routerPatients.post('/:id/entries', (req, res) => {
 
         const newUuid = uuidv4();
         const result = findById(patientId);
-        const { description, date, specialist, type, diagnosisCodes } = req.body as HospitalEntryRaw;
+        const { description, date, specialist, type, diagnosisCodes, discharge } = req.body as HospitalEntryRaw;
         
         //const input = "apple,banana,cherry";
-        const tmp = diagnosisCodes.split(" ");
+        const tmp = diagnosisCodes.split(",");
 
         if (result !== undefined) {
           result.entries.push({ id: newUuid, description: description, 
-            date: date, specialist: specialist, type: type, diagnosisCodes: tmp });
+            date: date, specialist: specialist, type: type, diagnosisCodes: tmp, discharge: discharge });
           console.log('DEBUG result:', result);
           const entryArray: NewPatientEntry[] = [];
           entryArray.push(result);
