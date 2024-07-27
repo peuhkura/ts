@@ -185,10 +185,15 @@ routerPatients.post('/:id/entries', (req, res) => {
       if (isValidHealthCheckEntry(entry)) {
         // Process HealthCheckEntry
         console.log('DEBUG Received HealthCheckEntry:', entry);
+
+        res.status(400).send({ error: 'XXX Backend' });
+/*       
+
         const { description, date, specialist, type, healthCheckRating } = req.body as HealthCheckEntry;
 
         const newUuid = uuidv4();
         const result = findById(patientId);
+
         if (result !== undefined) {
 
           //let tmp: Entry =  { description: description, date: date, specialist: specialist, type: type }
@@ -196,8 +201,12 @@ routerPatients.post('/:id/entries', (req, res) => {
           console.log('DEBUG result:', result);
           const entryArray: NewPatientEntry[] = [];
           entryArray.push(result);
-          res.json(transformNewPatientsResultWithSsn (entryArray));
-        }
+          //res.json(transformNewPatientsResultWithSsn (entryArray));
+
+          res.status(400).send({ error: 'XXX Backend' });
+
+        }*/
+
       } else {
         res.status(400).send({ error: 'Invalid HealthCheckEntry' });
       }
