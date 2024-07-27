@@ -186,7 +186,7 @@ routerPatients.post('/:id/entries', (req, res) => {
         // Process HealthCheckEntry
         console.log('DEBUG Received HealthCheckEntry:', entry);
 
-        res.status(400).send({ error: 'XXX Backend' });
+        res.status(400).send({ error: 'XXX AAA Backend' });
 /*       
 
         const { description, date, specialist, type, healthCheckRating } = req.body as HealthCheckEntry;
