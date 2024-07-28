@@ -130,17 +130,6 @@ const App = () => {
   //
   // Content
   // 
-  /*const Content: React.FC<ContentProps> = ({ courseParts }) => {
-    return (
-      <div>
-        {courseParts.map((part, index) => (
-          <p key={index}>
-            <b>{part.name}</b> {part.exerciseCount}
-          </p>
-        ))}
-      </div>
-    );
-  };*/
   type ContentProps = {
     courseParts: CoursePart[];
   };
@@ -151,43 +140,6 @@ const App = () => {
       </div>
     );
   };
-  /*
-  //
-  // Content
-  // 
-  const parts = [
-    {
-      name: 'Fundamentals of React',
-      exercises: 10
-    },
-    {
-      name: 'Using props to pass data',
-      exercises: 7
-    },
-    {
-      name: 'State of a component',
-      exercises: 14
-    }
-  ] 
-  type Exercise = {
-    name: string;
-    exercises: number;
-  };
-  type ContentProps = {
-    parts: Exercise[];
-  };
-  const Content: React.FC<ContentProps> = ({ parts }) => {
-    return (
-      <div>
-        {parts.map((part, index) => (
-          <p key={index}>
-            {part.name} {part.exercises}
-          </p>
-        ))}
-      </div>
-    );
-  };
-*/
 
   //
   // Total exercises

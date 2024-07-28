@@ -131,35 +131,8 @@ const setNewPatient =
   return newEntry;
 };
 
-/*
-function addEntry() => {
-  const patientId = req.query.patientId;
-  console.log(`Received: ${patientId}`);
-  if (patientId !== null && typeof patientId === 'string') {
-    console.log(`Return only id: ${patientId}`);
-
-    // Function to find object by ID
-    const findById = (id: string) => {
-        return newPatientEntries.find(item => item.id === id);
-    };
-
-    // Call findById function and send response using res.json
-    const result = findById(patientId);
-    console.log(`Return only id: ${JSON.stringify(result)}`);
-    const entryArray: NewPatientEntry[] = [];
-    if (result !== undefined) {
-        entryArray.push(result);
-    }
-    res.json(transformNewPatientsResultWithSsn (entryArray));
-  } else {
-    console.log(`Return all ids.`);
-    res.json(transformNewPatientsResult (newPatientEntries));
-  }
-});
-*/
-
 const isValidHealthCheckEntry = (entry: any): entry is HealthCheckEntry => {
-  return entry.healthCheckRating !== undefined;
+  return (entry.healthCheckRating !== undefined)
 };
 
 const isValidOccupationalHealthcareEntry = (entry: any): entry is OccupationalHealthcareEntry => {
@@ -180,42 +153,35 @@ routerPatients.post('/:id/entries', (req, res) => {
     return newPatientEntries.find(item => item.id === id);
   };
 
+  if (entry.description == '') { res.status(400).send({ error: 'Add description' }); }
+  else if (entry.date == '') { res.status(400).send({ error: 'Add date' }); }
+  else if (entry.specialist == '') { res.status(400).send({ error: 'Add specialist' }); }
+
   switch (entry.type) {
-    case "HealthCheck":
+    case "HealthCheck": // Process HealthCheckEntry
       if (isValidHealthCheckEntry(entry)) {
-        // Process HealthCheckEntry
         console.log('DEBUG Received HealthCheckEntry:', entry);
-
-        res.status(400).send({ error: 'XXX AAA Backend' });
-/*       
-
         const { description, date, specialist, type, healthCheckRating } = req.body as HealthCheckEntry;
 
         const newUuid = uuidv4();
         const result = findById(patientId);
 
         if (result !== undefined) {
-
-          //let tmp: Entry =  { description: description, date: date, specialist: specialist, type: type }
           result.entries.push({ id: newUuid, description: description, date: date, specialist: specialist, type: type, healthCheckRating: healthCheckRating });
           console.log('DEBUG result:', result);
           const entryArray: NewPatientEntry[] = [];
           entryArray.push(result);
-          //res.json(transformNewPatientsResultWithSsn (entryArray));
-
-          res.status(400).send({ error: 'XXX Backend' });
-
-        }*/
-
+          res.json(transformNewPatientsResultWithSsn (entryArray));
+        }
+        res.status(400).send({ error: 'Backend error (HealthCheck entry)' });
       } else {
         res.status(400).send({ error: 'Invalid HealthCheckEntry' });
       }
       break;
-    case "OccupationalHealthcare":
+    case "OccupationalHealthcare": // Process OccupationalHealthcareEntry
       if (isValidOccupationalHealthcareEntry(entry)) {
-        // Process OccupationalHealthcareEntry
         console.log('DEBUG Received OccupationalHealthcareEntry:', entry);
-
+        if (entry.employerName == '') { res.status(400).send({ error: 'Add employer name' }); }
 
         const newUuid = uuidv4();
         const result = findById(patientId);
@@ -234,9 +200,9 @@ routerPatients.post('/:id/entries', (req, res) => {
         res.status(400).send({ error: 'Invalid OccupationalHealthcareEntry' });
       }
       break;
-    case "Hospital":
+    case "Hospital": // Process HospitalEntry
       if (isValidHospitalEntry(entry)) {
-        // Process HospitalEntry
+       
         console.log('DEBUG Received HospitalEntry:', entry);
 
         const newUuid = uuidv4();
@@ -261,47 +227,6 @@ routerPatients.post('/:id/entries', (req, res) => {
     default:
       res.status(400).send({ error: 'Invalid entry type' });
   }
-
-
-  //console.log('DEBUG POST /:id/entries, body:', req.body);
- 
-
-  // Ensure type safety for each field
-  /*const { description, date, specialist, type } = req.body as BaseEntry;
-  if (
-    typeof description === 'string' &&
-    typeof date === 'string' &&
-    typeof specialist === 'string' &&
-    typeof type === 'string'
-  ) {
-    // Function to find object by ID
-    const findById = (id: string) => {
-      return newPatientEntries.find(item => item.id === id);
-    };
-    const result = findById(patientId);
-    if (result !== undefined) {
-      console.log('DEBUG found patient with given id:', patientId);
-
-      const newUuid = uuidv4();
-
-      //let tmp: Entry =  { description: description, date: date, specialist: specialist, type: type }
-      result.entries.push({ id: newUuid, description: description, date: date, specialist: specialist, type: type, employerName: "TODO"});
-      console.log('DEBUG result:', result);
-      const entryArray: NewPatientEntry[] = [];
-      entryArray.push(result);
-      res.json(transformNewPatientsResultWithSsn (entryArray));
-    } else {
-      console.log('DEBUG no patient with given ide:', patientId);
-
-      res.status(400).send('Patient not found with given id.');
-    }
-    //const addedEntry = setNewEntry(description, date, specialist, diagnosisCodes, type);
-    //res.json(addedEntry);
-  } else {
-    res.status(400).send('Invalid data');
-  }*/
-
-  //res.json({ message: `Entry for patient: ${patientId}` });
 });
 
 routerPatients.post('/', (req, res) => {
