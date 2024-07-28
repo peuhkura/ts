@@ -131,16 +131,16 @@ const setNewPatient =
   return newEntry;
 };
 
-const isValidHealthCheckEntry = (entry: any): entry is HealthCheckEntry => {
-  return (entry.healthCheckRating !== undefined)
+const isValidHealthCheckEntry = (entry: unknown): entry is HealthCheckEntry => {
+  return (entry as HealthCheckEntry).healthCheckRating !== undefined;
 };
 
-const isValidOccupationalHealthcareEntry = (entry: any): entry is OccupationalHealthcareEntry => {
-  return entry.employerName !== undefined;
+const isValidOccupationalHealthcareEntry = (entry: unknown): entry is OccupationalHealthcareEntry => {
+  return (entry as OccupationalHealthcareEntry).employerName !== undefined;
 };
 
-const isValidHospitalEntry = (entry: any): entry is HospitalEntry => {
-  return entry.discharge !== undefined;
+const isValidHospitalEntry = (entry: unknown): entry is HospitalEntry => {
+  return (entry as HospitalEntry).discharge !== undefined;
 };
 
 // Define a route for getting entries for a specific patient by ID
